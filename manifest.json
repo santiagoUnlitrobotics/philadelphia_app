@@ -1,0 +1,19 @@
+{
+    "name": "Philadelphia app",
+    "description": "Optimize hospital logistics with our delivery app. Automate item transportation, relieving staff burden. Timely, essential deliveries for patient care.",
+    "type": "app",
+    "version" : "0.0.1",
+    "dependencies" : {
+        "pip": [],
+        "skills": []
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/santiagoUnlitrobotics/philadelphia_app"
+    },
+    "license": "MIT",
+    "author": {
+        "name": "Santiago",
+        "url": ""
+    }
+}
