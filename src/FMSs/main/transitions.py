@@ -71,6 +71,7 @@ class Transitions(BaseTransitions):
 
         
     async def PACKAGE_DELIVERED(self):
+        await self.app.sleep(5)
         self.set_state('CHECK_IF_MORE_PACKAGES')
 
     
@@ -114,13 +115,15 @@ class Transitions(BaseTransitions):
         self.set_state('END')
         
     
-    async def PACKAGE_DELIVERED_TO_UNKOWN(self):
+    async def PACKAGE_NOT_CONFIRMED(self):
         self.set_state('CHECK_IF_MORE_PACKAGES')
 
 
     async def MAX_RETRIES_ON_NOTIFICATION(self):
+        await self.app.sleep(5)
         self.set_state('PACKAGE_NOT_DELIVERED')
 
 
     async def PACKAGE_NOT_DELIVERED(self):
+        await self.app.sleep(5)
         self.set_state('CHECK_IF_MORE_PACKAGES')
