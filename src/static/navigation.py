@@ -1,6 +1,6 @@
 from raya.enumerations import POSITION_UNIT, ANGLE_UNIT
 
-NAV_WAREHOUSE_MAP_NAME = 'unity_warehouse'
+NAV_WAREHOUSE_MAP_NAME = 'tags_floor.03'
 
 NAV_WAREHOUSE = {
         'x':        0.0,

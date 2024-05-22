@@ -16,7 +16,7 @@ class Transitions(BaseTransitions):
 
     async def SETUP_ACTIONS(self):
         if await self.app.nav.is_localized():
-            self.set_state('NAV_TO_CART')
+            self.set_state('NAV_TO_WAREHOUSE_FLOOR_SKILL')
         else:
             self.abort(*ERR_COULD_NOT_LOCALIZE)
 
@@ -39,7 +39,7 @@ class Transitions(BaseTransitions):
         if not self.app.nav.is_navigating():
             nav_error = self.app.nav.get_last_result()
             if nav_error[0] == 0:
-                self.set_state('ATTACH_TO_CART_SKILL')
+                self.set_state('NAV_TO_DELIVERY_FLOOR_SKILL')
             else:
                 self.abort(*ERR_COULD_NOT_NAV_TO_CART)
 
@@ -113,3 +113,14 @@ class Transitions(BaseTransitions):
     async def NOTIFY_ALL_PACKAGES_STATUS(self):
         self.set_state('END')
         
+    
+    async def PACKAGE_DELIVERED_TO_UNKOWN(self):
+        self.set_state('CHECK_IF_MORE_PACKAGES')
+
+
+    async def MAX_RETRIES_ON_NOTIFICATION(self):
+        self.set_state('PACKAGE_NOT_DELIVERED')
+
+
+    async def PACKAGE_NOT_DELIVERED(self):
+        self.set_state('CHECK_IF_MORE_PACKAGES')
