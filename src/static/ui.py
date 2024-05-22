@@ -11,3 +11,8 @@ UI_SCREEN_NAV_TO_CART_LOCATION = {
         'title':'Navigating', 
         'subtitle':'Going to cart location',
     }
+
+UI_SCREEN_FAILED = {
+        'title':'Failed', 
+        'subtitle':'Something went wrong.',
+    }

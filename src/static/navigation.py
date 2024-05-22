@@ -1,8 +1,8 @@
 from raya.enumerations import POSITION_UNIT, ANGLE_UNIT
 
-NAV_MAP_NAME = 'unity_apartment'
+NAV_WAREHOUSE_MAP_NAME = 'unity_warehouse'
 
-NAV_HOME = {
+NAV_WAREHOUSE = {
         'x':        0.0,
         'y':        0.0,
         'angle':    90.0, 
@@ -10,7 +10,7 @@ NAV_HOME = {
         'ang_unit': ANGLE_UNIT.DEGREES,
     }
 
-NAV_CART_LOCATION = {
+NAV_CART_POINT = {
         'x':        0.0,
         'y':        0.0,
         'angle':    90.0, 

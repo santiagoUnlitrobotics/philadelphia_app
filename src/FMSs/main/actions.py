@@ -5,8 +5,8 @@ from raya.tools.fsm import BaseActions
 from raya.exceptions import RayaSoundErrorPlayingAudio
 
 from src.app import RayaApplication
-from src.static.navigation import *
-from src.static.ui import *
+from src.static.navigation import NAV_WAREHOUSE_MAP_NAME, NAV_WAREHOUSE, NAV_CART_POINT
+from src.static.ui import UI_SCREEN_FAILED, UI_SCREEN_LOCALIZING
 from src.static.constants import *
 from .helpers import Helpers
 
@@ -19,35 +19,48 @@ class Actions(BaseActions):
         self.helpers = helpers
 
 
-    async def enter_LOCALIZING(self):
+    async def enter_SETUP_ACTIONS(self):
         await self.app.ui.display_screen(**UI_SCREEN_LOCALIZING)
-        await self.app.nav.set_map(NAV_MAP_NAME)
+        await self.app.nav.set_map(NAV_WAREHOUSE_MAP_NAME)
 
 
-    async def LOCALIZING_to_NAV_TO_CART(self):
-        await self.app.ui.display_screen(**UI_SCREEN_NAV_TO_CART_LOCATION)
-
-
-    async def enter_NAV_TO_CART(self):
+    async def enter_NAV_TO_WAREHOUSE(self):
         await self.app.nav.navigate_to_position(
-                **NAV_CART_LOCATION,
-                wait=False,
+                **NAV_WAREHOUSE,
+                callback_feedback_async=self.helpers.nav_feedback_async,
+            )
+    
+    
+    async def enter_ATTACH_TO_CART_SKILL(self):
+        await self.app.nav.navigate_to_position(
+                **NAV_CART_POINT,
+                callback_feedback_async=self.helpers.nav_feedback_async,
+            )
+
+    
+    async def enter_NAV_TO_DELIVERY_POINT(self):
+        delivery_point, _ = self.helpers.current_package
+        delivery_location = {
+            'x': delivery_point[0],
+            'y': delivery_point[1],
+            'angle': 90, 
+        }
+        await self.app.nav.navigate_to_position(
+                **delivery_location,
                 callback_feedback_async=self.helpers.nav_feedback_async,
             )
 
 
-    async def enter_FAILED_FIRST_TRY_NAV_TO_CART(self):
-        if self.helpers.sound_clear_the_way is None:
-            await self.helpers.play_clear_the_way_sound()
-
-    
-    async def enter_RECOGNIZING_CART(self):
-        await self.helpers.stop_clear_the_way_sound()
+    async def enter_NAV_TO_WAREHOUSE_FLOOR_SKILL_RETURN(self):
+        await self.app.nav.navigate_to_position(
+                **NAV_WAREHOUSE,
+                callback_feedback_async=self.helpers.nav_feedback_async,
+            )
 
 
-    # async def aborted(self, error, msg):
-    #     await self.app.ui.display_screen(
-    #             **UI_SCREEN_FAILED,
-    #             subtitle=f'ERROR {error}: {msg}'
-    #         )
-    #     await self.app.sound.play_sound(name='error')
+    async def aborted(self, error, msg):
+        await self.app.ui.display_screen(
+                **UI_SCREEN_FAILED,
+                subtitle=f'ERROR {error}: {msg}'
+            )
+        await self.app.sound.play_sound(name='error')
