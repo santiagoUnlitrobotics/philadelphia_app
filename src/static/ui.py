@@ -78,6 +78,5 @@ UI_PACKAGE_NOT_CONFIRMED = {
     }
 
 UI_SCREEN_FAILED = {
-        'title':'Failed', 
-        'subtitle':'Something went wrong.',
+        'title':'Failed',
     }

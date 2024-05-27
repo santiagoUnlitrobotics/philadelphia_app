@@ -3,7 +3,9 @@ from raya.tools.fsm import FSM
 
 from src.app import RayaApplication
 from src.static.app_errors import *
-from src.static.navigation import NAV_WAREHOUSE_MAP_NAME
+from src.static.navigation import *
+from src.static.leds import *
+from src.static.sound import *
 
 
 class Helpers:
@@ -17,7 +19,9 @@ class Helpers:
         )
 
     async def check_if_robot_in_warehouse_floor(self):
-        is_localized,_,_,map_name = await self.app.nav.get_status()
+        result = await self.app.nav.get_status()
+        is_localized = result['localized']
+        map_name = result['map_name']
         if is_localized and map_name == NAV_WAREHOUSE_MAP_NAME:
             return True
         return False
@@ -46,6 +50,23 @@ class Helpers:
         self.app.log.debug(
             f'nav_feedback_async: {code}, {msg}, {distance_to_goal}, {speed}'
         )
+        # if code == 9:
+        #     await self.app.sound.play_sound(
+        #         name='error'
+        #     )
         
-        if code == 9: # Waiting for obstacle to move
-            await self.app.sound.play_sound(name='error')
+    async def nav_finish_async(self, code, msg):
+        self.app.log.debug(
+            f'nav_finish_async: {code}, {msg}'
+        )
+
+
+    async def task_approaching_to_cart_audio(self):
+        while True:
+            await self.app.leds.animation(**LEDS_ATTACHING_TO_CART)
+            await self.app.sound.play_sound(
+                **SOUND_ATTACHING_TO_CART,
+                wait=True,
+            )
+            await self.app.sleep(2)
+

@@ -3,6 +3,9 @@ from raya.tools.fsm import BaseTransitions
 from src.app import RayaApplication
 from src.static.app_errors import *
 from src.static.constants import *
+from src.static.fleet import *
+from src.static.leds import *
+from src.static.sound import *
 from .helpers import Helpers
 from .errors import *
 
@@ -63,15 +66,55 @@ class Transitions(BaseTransitions):
 
 
     async def WAIT_FOR_CHEST_CONFIRMATION(self):
-        self.set_state('CONFIRMATION_ON_FLEET')
+        sensors_data = self.app.sensors.get_all_sensors_values()
+        button_chest = sensors_data['chest_button']
+        if button_chest!=0:
+            self.set_state('CONFIRMATION_ON_FLEET')
 
+        if not self.sound.is_playing():
+            await self.app.leds.animation(
+                **LEDS_WAIT_FOR_BUTTON_CHEST_HEAD, 
+                wait=False
+            )
+            await self.app.leds.animation(
+                **LEDS_WAIT_FOR_BUTTON_CHEST_BUTTON,
+                wait=False
+            )
+            await self.app.sound.play_sound(
+                **SOUND_WAIT_FOR_CHEST_BUTTON,
+                wait=False,
+            )
         
     async def CONFIRMATION_ON_FLEET(self):
-        self.set_state('PACKAGE_DELIVERED')
+        if not self.sound.is_playing():
+            await self.app.leds.animation(
+                **LEDS_WAIT_FOR_FLEET_CONFIRMATION,
+                wait=False
+            )
+            await self.app.sound.play_sound(
+                **SOUND_WAIT_FOR_FLEET_CONFIRMATION,
+                wait=False,
+            )
+        
+        # response = await self.app.fleet.request_action(
+        #     **FLEET_REQUEST_CONFIRMATION_PACKAGE
+        # )
+        # if response == 'ok':
+        #     self.set_state('PACKAGE_DELIVERED')
+
+        if not self.app.sound.is_playing():
+            self.set_state('PACKAGE_DELIVERED')
 
         
     async def PACKAGE_DELIVERED(self):
-        await self.app.sleep(5)
+        await self.app.leds.animation(
+            **LEDS_PACKAGE_DELIVERED,
+                wait=False
+            )
+        await self.app.sound.play_sound(
+            **SOUND_PACKAGE_DELIVERED,
+            wait=True,
+        )
         self.set_state('CHECK_IF_MORE_PACKAGES')
 
     
@@ -109,12 +152,12 @@ class Transitions(BaseTransitions):
 
     async def DE_ATTACH_CART_SKILL(self):
         self.set_state('NOTIFY_ALL_PACKAGES_STATUS')
-        
-    
+
+
     async def NOTIFY_ALL_PACKAGES_STATUS(self):
         self.set_state('END')
-        
-    
+
+
     async def PACKAGE_NOT_CONFIRMED(self):
         self.set_state('CHECK_IF_MORE_PACKAGES')
 
